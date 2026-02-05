@@ -1,0 +1,133 @@
+﻿<Window x:Class="SocialChatTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Social Chat Tool - Multi-Platform Messenger" 
+        Height="600" Width="900"
+        Background="#F5F5F5">
+    
+    <Window.Resources>
+        <!-- Modern button style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#BDBDBD"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Page Selection -->
+        <GroupBox Grid.Row="0" Header="Chọn Page" Padding="10" Margin="0,0,0,15">
+            <ComboBox x:Name="PageComboBox"
+                      ItemsSource="{Binding Pages}"
+                      SelectedItem="{Binding SelectedPage}"
+                      DisplayMemberPath="DisplayText"
+                      Height="35"
+                      FontSize="13"
+                      Padding="8,5"/>
+        </GroupBox>
+
+        <!-- Conversations List -->
+        <GroupBox Grid.Row="1" Header="Danh sách Hội thoại" Padding="10" Margin="0,0,0,15">
+            <ListBox x:Name="ConversationsListBox"
+                     ItemsSource="{Binding Conversations}"
+                     SelectedItem="{Binding SelectedConversation}"
+                     DisplayMemberPath="Name"
+                     FontSize="13"
+                     Padding="5"
+                     BorderThickness="1"
+                     BorderBrush="#E0E0E0">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Setter Property="Margin" Value="0,2"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#E3F2FD"/>
+                                <Setter Property="Foreground" Value="#1976D2"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#F5F5F5"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </GroupBox>
+
+        <!-- Message Input -->
+        <GroupBox Grid.Row="2" Header="Gửi tin nhắn" Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- TextBox -->
+                <TextBox x:Name="MessageTextBox"
+                         Grid.Row="0"
+                         Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"
+                         Height="80"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         FontSize="13"
+                         Padding="8"
+                         BorderThickness="1"
+                         BorderBrush="#E0E0E0"
+                         Margin="0,0,0,10">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="BorderBrush" Value="#2196F3"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <!-- Send Button -->
+                <Button Grid.Row="1"
+                        Content="Gửi tin nhắn"
+                        Command="{Binding SendMessageCommand}"
+                        Style="{StaticResource ModernButton}"
+                        HorizontalAlignment="Right"
+                        MinWidth="120"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
