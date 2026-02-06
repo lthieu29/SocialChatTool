@@ -4,15 +4,35 @@ using SocialChatTool.Models;
 namespace SocialChatTool.Services;
 
 /// <summary>
-/// Service for database operations
+/// Service for database operations - supports dynamic connection string
 /// </summary>
 public class DatabaseService
 {
-    private readonly AppDbContext _context;
+    private string? _connectionString;
 
-    public DatabaseService(AppDbContext context)
+    public DatabaseService()
     {
-        _context = context;
+    }
+
+    /// <summary>
+    /// Set connection string for company database
+    /// </summary>
+    public void SetConnectionString(string connectionString)
+    {
+        _connectionString = connectionString;
+    }
+
+    /// <summary>
+    /// Check if connection string is set
+    /// </summary>
+    public bool IsConnected => !string.IsNullOrEmpty(_connectionString);
+
+    private AppDbContext CreateContext()
+    {
+        if (string.IsNullOrEmpty(_connectionString))
+            throw new InvalidOperationException("Connection string not set. Please select a company first.");
+        
+        return new AppDbContext(_connectionString);
     }
 
     /// <summary>
@@ -21,7 +41,8 @@ public class DatabaseService
     /// </summary>
     public async Task<List<SocialPage>> GetPagesAsync()
     {
-        return await _context.SocialPages
+        await using var context = CreateContext();
+        return await context.SocialPages
             .GroupBy(p => new { p.SocialType, p.PageID, p.Name })
             .Select(g => g.First())
             .OrderBy(p => p.SocialType)
@@ -34,7 +55,8 @@ public class DatabaseService
     /// </summary>
     public async Task<List<SocialConversation>> GetConversationsAsync(string pageId, int socialType)
     {
-        return await _context.SocialConversations
+        await using var context = CreateContext();
+        return await context.SocialConversations
             .Where(c => c.PageID == pageId && c.SocialType == socialType)
             .OrderBy(c => c.Name)
             .ToListAsync();

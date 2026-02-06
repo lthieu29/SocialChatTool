@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         _viewModel = viewModel;
         DataContext = _viewModel;
         
-        // Load pages when window is loaded
-        Loaded += async (s, e) => await _viewModel.LoadPagesCommand.ExecuteAsync(null);
+        // Load companies when window is loaded
+        Loaded += async (s, e) => await _viewModel.LoadCompaniesCommand.ExecuteAsync(null);
     }
 }

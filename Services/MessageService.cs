@@ -14,7 +14,7 @@ public class MessageService
     /// <param name="message">Message text to send</param>
     public async Task SendMessage(int socialType, string pageId, string conversationId, string message)
     {
-        switch (socialType)
+        /*switch (socialType)
         {
             case 1: // Zalo OA
                 await SendZaloOAMessage(pageId, conversationId, message);
@@ -38,6 +38,6 @@ public class MessageService
                 
             default:
                 throw new NotSupportedException($"SocialType {socialType} không được hỗ trợ");
-        }
+        }*/
     }
 }

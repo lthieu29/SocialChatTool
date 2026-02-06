@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Windows;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SocialChatTool.Services;
@@ -37,16 +36,15 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        // Register DbContext with MySQL
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        });
+        // Register CompanyService with management connection string
+        var managementConnectionString = configuration.GetConnectionString("ManagementConnection");
+        services.AddSingleton(new CompanyService(managementConnectionString!));
 
-        // Register services
-        services.AddScoped<DatabaseService>();
-        services.AddScoped<MessageService>();
+        // Register DatabaseService (connection string will be set dynamically)
+        services.AddSingleton<DatabaseService>();
+        
+        // Register MessageService
+        services.AddSingleton<MessageService>();
 
         // Register ViewModels
         services.AddTransient<MainViewModel>();

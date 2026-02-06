@@ -5,15 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Social Chat Tool - Multi-Platform Messenger" 
-        Height="600" Width="900"
-        Background="#F5F5F5">
+        Height="750" Width="1000"
+        Background="#F0F2F5"
+        WindowStartupLocation="CenterScreen">
     
     <Window.Resources>
-        <!-- Modern button style -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="#2196F3"/>
+        <!-- Color Palette -->
+        <SolidColorBrush x:Key="PrimaryColor" Color="#1877F2"/>
+        <SolidColorBrush x:Key="PrimaryHoverColor" Color="#166FE5"/>
+        <SolidColorBrush x:Key="SuccessColor" Color="#42B72A"/>
+        <SolidColorBrush x:Key="CardBackground" Color="White"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#DADDE1"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#1C1E21"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#65676B"/>
+
+        <!-- Boolean to Visibility Converter -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Modern Card Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Direction="270"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Button Style -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Padding" Value="20,12"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -22,7 +48,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="4"
+                                CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" 
                                             VerticalAlignment="Center"/>
@@ -32,11 +58,62 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#1976D2"/>
+                    <Setter Property="Background" Value="{StaticResource PrimaryHoverColor}"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#BDBDBD"/>
+                    <Setter Property="Background" Value="#BCC0C4"/>
                     <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Success Button Style -->
+        <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="{StaticResource SuccessColor}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#36A420"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#BCC0C4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Modern TextBox Style -->
+        <Style x:Key="SearchTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#F0F2F5"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="20"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                                        VerticalAlignment="Center"
+                                        Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- DataGrid Row Style -->
+        <Style x:Key="CompanyDataGridRow" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0,4"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E7F3FF"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -46,88 +123,333 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Page Selection -->
-        <GroupBox Grid.Row="0" Header="Chọn Page" Padding="10" Margin="0,0,0,15">
-            <ComboBox x:Name="PageComboBox"
-                      ItemsSource="{Binding Pages}"
-                      SelectedItem="{Binding SelectedPage}"
-                      DisplayMemberPath="DisplayText"
-                      Height="35"
-                      FontSize="13"
-                      Padding="8,5"/>
-        </GroupBox>
+        <!-- Placeholder Border (hidden) -->
+        <Border Grid.Row="0" Visibility="Collapsed"/>
 
-        <!-- Conversations List -->
-        <GroupBox Grid.Row="1" Header="Danh sách Hội thoại" Padding="10" Margin="0,0,0,15">
-            <ListBox x:Name="ConversationsListBox"
-                     ItemsSource="{Binding Conversations}"
-                     SelectedItem="{Binding SelectedConversation}"
-                     DisplayMemberPath="Name"
-                     FontSize="13"
-                     Padding="5"
-                     BorderThickness="1"
-                     BorderBrush="#E0E0E0">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="10,8"/>
-                        <Setter Property="Margin" Value="0,2"/>
+        <!-- Main Content Grid -->
+        <Grid Grid.Row="0" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Company Selection Card (visible when no company selected) -->
+            <Border Grid.Row="0" Grid.RowSpan="2" Padding="24">
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource CardStyle}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#E3F2FD"/>
-                                <Setter Property="Foreground" Value="#1976D2"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F5F5F5"/>
-                            </Trigger>
+                            <DataTrigger Binding="{Binding IsCompanySelected}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
-        </GroupBox>
+                </Border.Style>
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-        <!-- Message Input -->
-        <GroupBox Grid.Row="2" Header="Gửi tin nhắn" Padding="10">
-            <Grid>
+                    <!-- Header -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                        <TextBlock Text="🏢 Chọn Công ty" 
+                                   FontSize="24" FontWeight="Bold" 
+                                   Foreground="{StaticResource TextPrimary}"/>
+                        <TextBlock Text="Vui lòng chọn công ty để tiếp tục" 
+                                   FontSize="14" 
+                                   Foreground="{StaticResource TextSecondary}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <!-- Search Box -->
+                    <Grid Grid.Row="1" Margin="0,0,0,15">
+                        <TextBox Style="{StaticResource SearchTextBox}"
+                                 Text="{Binding CompanySearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="🔍 Tìm kiếm theo mã hoặc tên công ty..."/>
+                        <TextBlock Text="🔍 Tìm kiếm theo mã hoặc tên công ty..." 
+                                   IsHitTestVisible="False"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   VerticalAlignment="Center"
+                                   Margin="16,0,0,0"
+                                   FontSize="14">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CompanySearchText}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- Company DataGrid -->
+                    <Border Grid.Row="2" 
+                            BorderBrush="{StaticResource BorderColor}" 
+                            BorderThickness="1" 
+                            CornerRadius="8"
+                            Margin="0,0,0,15">
+                        <DataGrid ItemsSource="{Binding CompaniesView}"
+                                  SelectedItem="{Binding SelectedCompany}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#E4E6EB"
+                                  BorderThickness="0"
+                                  Background="Transparent"
+                                  RowStyle="{StaticResource CompanyDataGridRow}"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserResizeRows="False">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F7F8FA"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="Padding" Value="12,10"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="12,8"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGridCell">
+                                                <Border Padding="{TemplateBinding Padding}" 
+                                                        Background="{TemplateBinding Background}">
+                                                    <ContentPresenter VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Mã công ty" Binding="{Binding CompanyCode}" Width="150"/>
+                                <DataGridTextColumn Header="Tên công ty" Binding="{Binding CompanyName}" Width="*"/>
+                                <DataGridTextColumn Header="Server" Binding="{Binding DataSource}" Width="150"/>
+                                <DataGridTextColumn Header="Database" Binding="{Binding InitialCatalog}" Width="150"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- Select Button -->
+                    <Button Grid.Row="3"
+                            Content="✓ Chọn công ty"
+                            Command="{Binding SelectCompanyCommand}"
+                            Style="{StaticResource SuccessButton}"
+                            HorizontalAlignment="Right"
+                            MinWidth="150"/>
+                </Grid>
+            </Border>
+
+            <!-- Main App Content (visible after company selected) -->
+            <Grid Grid.Row="0" Grid.RowSpan="2">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsCompanySelected}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- TextBox -->
-                <TextBox x:Name="MessageTextBox"
-                         Grid.Row="0"
-                         Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"
-                         Height="80"
-                         TextWrapping="Wrap"
-                         AcceptsReturn="True"
-                         VerticalScrollBarVisibility="Auto"
-                         FontSize="13"
-                         Padding="8"
-                         BorderThickness="1"
-                         BorderBrush="#E0E0E0"
-                         Margin="0,0,0,10">
-                    <TextBox.Style>
-                        <Style TargetType="TextBox">
-                            <Style.Triggers>
-                                <Trigger Property="IsFocused" Value="True">
-                                    <Setter Property="BorderBrush" Value="#2196F3"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Style>
-                </TextBox>
+                <!-- Company Info Bar -->
+                <Border Grid.Row="0" Style="{StaticResource CardStyle}" 
+                        Padding="16,12" Margin="0,0,0,15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="🏢" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding SelectedCompanyInfo}" 
+                                       FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{StaticResource SuccessColor}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <Button Grid.Column="1" Content="Đổi công ty" 
+                                Padding="12,6" FontSize="12"
+                                Background="Transparent"
+                                Foreground="{StaticResource PrimaryColor}"
+                                BorderThickness="1"
+                                BorderBrush="{StaticResource PrimaryColor}"
+                                Cursor="Hand"
+                                Command="{Binding LoadCompaniesCommand}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="4"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                </Border>
 
-                <!-- Send Button -->
-                <Button Grid.Row="1"
-                        Content="Gửi tin nhắn"
-                        Command="{Binding SendMessageCommand}"
-                        Style="{StaticResource ModernButton}"
-                        HorizontalAlignment="Right"
-                        MinWidth="120"/>
+                <!-- Page Selection -->
+                <Border Grid.Row="1" Style="{StaticResource CardStyle}" 
+                        Padding="16" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="📱 Chọn Page" 
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,0,10"/>
+                        <ComboBox ItemsSource="{Binding Pages}"
+                                  SelectedItem="{Binding SelectedPage}"
+                                  DisplayMemberPath="DisplayText"
+                                  Height="40"
+                                  FontSize="14"
+                                  Padding="10,8"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Conversations List -->
+                <Border Grid.Row="2" Style="{StaticResource CardStyle}" 
+                        Padding="16" Margin="0,0,0,15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Text="💬 Danh sách Hội thoại" 
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,0,10"/>
+                        
+                        <ListBox Grid.Row="1"
+                                 ItemsSource="{Binding Conversations}"
+                                 SelectedItem="{Binding SelectedConversation}"
+                                 DisplayMemberPath="Name"
+                                 FontSize="14"
+                                 BorderThickness="1"
+                                 BorderBrush="{StaticResource BorderColor}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="12,10"/>
+                                    <Setter Property="Margin" Value="0,2"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        Padding="{TemplateBinding Padding}"
+                                                        CornerRadius="4">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#E7F3FF"/>
+                                            <Setter Property="Foreground" Value="{StaticResource PrimaryColor}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#F5F5F5"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Grid>
+                </Border>
+
+                <!-- Message Input -->
+                <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="✉️ Gửi tin nhắn" 
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,0,10"/>
+
+                        <TextBox Grid.Row="1"
+                                 Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"
+                                 Height="80"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 FontSize="14"
+                                 Padding="12"
+                                 BorderThickness="1"
+                                 BorderBrush="{StaticResource BorderColor}"
+                                 Margin="0,0,0,12">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="TextBox">
+                                                <Border Background="White"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="6">
+                                                    <ScrollViewer x:Name="PART_ContentHost" 
+                                                                Margin="{TemplateBinding Padding}"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsFocused" Value="True">
+                                            <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <Button Grid.Row="2"
+                                Content="📤 Gửi tin nhắn"
+                                Command="{Binding SendMessageCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Right"
+                                MinWidth="140"/>
+                    </Grid>
+                </Border>
             </Grid>
-        </GroupBox>
+        </Grid>
     </Grid>
 </Window>
